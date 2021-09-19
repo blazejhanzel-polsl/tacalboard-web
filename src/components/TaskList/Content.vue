@@ -3,7 +3,7 @@
     <h1>Skrzynka odbiorcza</h1>
     <hr>
     <div id="itemHolder">
-      <Task v-for="item in tasks" :key="item.uuid" :properties="item" />
+      <Task v-for="item in tasks" :key="item.uuid" :task="item" />
     </div>
     <div id="footer">
       <hr>
@@ -15,13 +15,14 @@
 <script>
 import axios from 'axios';
 import Button from '@/components/TaskList/Button.vue';
+import Task from '@/components/TaskList/Task.vue';
 
 const api = 'http://127.0.0.1:8080/organizer';
 
 export default {
-  name: 'HelloWorld',
+  name: 'TaskContent',
   components: {
-    Button,
+    Button, Task,
   },
   data() {
     return {
@@ -33,10 +34,14 @@ export default {
     getTasks(project) {
       axios.get(`${api}/tasks?project=${project}`).then((response) => {
         this.tasks = response.data;
+      }).catch((error) => {
+        if (error.response.status === 400) {
+          console.log('Podany projekt nie istnieje!'); // TODO
+        }
       });
     },
   },
-  beforemount() {
+  beforeMount() {
     this.getTasks('inbox');
   },
 };
